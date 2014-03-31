@@ -4,6 +4,8 @@ consistentHash
 consistentHash provides a consistent hashing implementation using murmur3 with a 64bit ring space.
 Virtual nodes are used to provide a good distribution.  
 
+[![Build Status](https://travis-ci.org/billhathaway/consistentHash.svg?branch=master)](https://travis-ci.org/billhathaway/consistentHash)
+
 This package has an almost identical API to StatHat's consistent package at https://github.com/stathat/consistent ,
 that packages uses a crc32 hash and a smaller number of vnodes by default.
 
