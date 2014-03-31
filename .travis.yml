@@ -1,2 +1,6 @@
 #
 language: go
+install:
+  - go get "github.com/spaolacci/murmur3"
+  - go get -t -v
+  - go build -v
