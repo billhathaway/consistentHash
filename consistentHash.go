@@ -18,7 +18,7 @@ var (
 )
 
 const (
-	// VnodeCount is a tradeoff of memory and ~ log(N) speed versus how well the hash spreads
+	// DefaultVnodeCount is a tradeoff of memory and ~ log(N) speed versus how well the hash spreads
 	DefaultVnodeCount = 200
 )
 
@@ -105,8 +105,8 @@ func (v *vnode) String() string {
 	return fmt.Sprintf("token=%d address=%s", v.token, v.address)
 }
 
-// Lookup finds the closest member for a given key
-func (ch *consistentHash) Lookup(key []byte) (string, error) {
+// Get finds the closest member for a given key
+func (ch *consistentHash) Get(key []byte) (string, error) {
 	ch.mutex.Lock()
 	defer ch.mutex.Unlock()
 	if len(ch.vnodes) == 0 {
@@ -116,11 +116,11 @@ func (ch *consistentHash) Lookup(key []byte) (string, error) {
 	return ch.vnodes[ch.closest(token)].address, nil
 }
 
-// Lookup2 finds the closest 2 members for a given key and is just a helper function
-// calling into LookupN
-func (ch *consistentHash) Lookup2(key []byte) (string, string, error) {
-	// don't use the mutex since LookupN will use it
-	servers, err := ch.LookupN(key, 2)
+// Get2 finds the closest 2 members for a given key and is just a helper function
+// calling into GetN
+func (ch *consistentHash) Get2(key []byte) (string, string, error) {
+	// don't use the mutex since GetN will use it
+	servers, err := ch.GetN(key, 2)
 	if err != nil {
 		return "", "", err
 	}
@@ -128,11 +128,11 @@ func (ch *consistentHash) Lookup2(key []byte) (string, string, error) {
 
 }
 
-// LookupN finds the closest N members for a given key
-func (ch *consistentHash) LookupN(key []byte, count int) ([]string, error) {
+// GetN finds the closest N members for a given key
+func (ch *consistentHash) GetN(key []byte, count int) ([]string, error) {
 	ch.mutex.Lock()
 	defer ch.mutex.Unlock()
-	if len(ch.vnodes) < count {
+	if len(ch.nodes) < count {
 		return nil, notEnoughMembersError
 	}
 	token := murmur3.Sum64(key)

@@ -12,7 +12,7 @@ See:
  http://en.wikipedia.org/wiki/MurmurHash
 
 
-The only time an error will be returned from a Lookup(), Lookup2(), or LookupN() call is if there are not enough members added
+The only time an error will be returned from a Get(), Get2(), or GetN() call is if there are not enough members added
 
 Basic Example:
   ch := consistentHash.New()
@@ -20,7 +20,7 @@ Basic Example:
   ch.Add("server2")
   ch.Add("server3")
   for _,key := range []string{"A","B","C","D","E","F","G"} {
-	   server,err := ch.Lookup([]byte(key)
+	   server,err := ch.Get([]byte(key)
 	   if err != nil {
 		  panic(err)
 	   }
@@ -43,13 +43,13 @@ Basic Example:
 	keys := []string{"A", "B", "C", "D", "E", "F", "G"}
 	fmt.Println("3 servers")
 	for _, key := range keys {
-		server, _ := ch.Lookup([]byte(key))
+		server, _ := ch.Get([]byte(key))
 		fmt.Printf("key=%s server=%s\n", key, server)
 	}
 	fmt.Println("Removing server3")
 	ch.Remove("server3")
 	for _, key := range keys {
-		server, _ := ch.Lookup([]byte(key))
+		server, _ := ch.Get([]byte(key))
 		fmt.Printf("key=%s server=%s\n", key, server)
 	}
 	Output:

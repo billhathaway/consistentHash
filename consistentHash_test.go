@@ -49,7 +49,7 @@ func Test_Distribution(t *testing.T) {
 	keymapping := make(map[string]string)
 	for i := 0; i < len(keys); i++ {
 		key := keys[i]
-		server, _ := c.Lookup(key)
+		server, _ := c.Get(key)
 		keymapping[string(key)] = server
 		distribution[server]++
 	}
@@ -64,7 +64,7 @@ func Test_Distribution(t *testing.T) {
 	stat = stats.Stats{}
 	for i := 0; i < len(keys); i++ {
 		key := keys[i]
-		server, _ := c.Lookup(key)
+		server, _ := c.Get(key)
 		if keymapping[string(key)] == server {
 			delete(keymapping, string(key))
 		}
@@ -87,7 +87,7 @@ func Benchmark_DefaultLookup(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		c.Lookup(keys[i%len(keys)])
+		c.Get(keys[i%len(keys)])
 	}
 }
 
@@ -102,7 +102,7 @@ func Benchmark_SingleVnodeLookup(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		c.Lookup(keys[i%len(keys)])
+		c.Get(keys[i%len(keys)])
 	}
 }
 
@@ -116,7 +116,7 @@ func Benchmark_1000VnodeLookup(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		c.Lookup(keys[i%len(keys)])
+		c.Get(keys[i%len(keys)])
 	}
 }
 
@@ -137,6 +137,27 @@ func Test_insertVnode(t *testing.T) {
 	assert.Equal(t, v3, ch.vnodes[3])
 	assert.Equal(t, v4, ch.vnodes[2])
 
+}
+
+func Test_Get2(t *testing.T) {
+	ch := New()
+	ch.Add("server1")
+	ch.Add("server2")
+	server1, server2, err := ch.Get2([]byte("testKey"))
+	assert.Nil(t, err)
+	assert.True(t, (server1 == "server1" && server2 == "server2") || (server1 == "server2" && server2 == "server1"))
+}
+
+func Test_GetN(t *testing.T) {
+	ch := New()
+	ch.Add("server1")
+	ch.Add("server2")
+	_, err := ch.GetN([]byte("testKey"), 3)
+	assert.Equal(t, err, notEnoughMembersError)
+	ch.Add("server3")
+	servers, err := ch.GetN([]byte("testKey"), 3)
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(servers))
 }
 
 // Test_removeVnode verifies that vnodes are correctly removed
@@ -173,7 +194,7 @@ func Example_basic() {
 	ch.Add("server3")
 	keys := []string{"A", "B", "C", "D", "E", "F", "G"}
 	for _, key := range keys {
-		server, err := ch.Lookup([]byte(key))
+		server, err := ch.Get([]byte(key))
 		if err != nil {
 			panic(err)
 		}
@@ -205,13 +226,13 @@ func Example_remove() {
 	keys := []string{"A", "B", "C", "D", "E", "F", "G"}
 	fmt.Println("3 servers")
 	for _, key := range keys {
-		server, _ := ch.Lookup([]byte(key))
+		server, _ := ch.Get([]byte(key))
 		fmt.Printf("key=%s server=%s\n", key, server)
 	}
 	fmt.Println("Removing server3")
 	ch.Remove("server3")
 	for _, key := range keys {
-		server, _ := ch.Lookup([]byte(key))
+		server, _ := ch.Get([]byte(key))
 		fmt.Printf("key=%s server=%s\n", key, server)
 	}
 }
