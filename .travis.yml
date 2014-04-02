@@ -1,0 +1,4 @@
+#
+language: go
+go: 1.2
+script: go get github.com/spaolacci/murmur3 && go get github.com/GaryBoone/GoStats/stats && go get github.com/stretchr/testify/assert && go test -v
