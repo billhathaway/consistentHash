@@ -58,7 +58,7 @@ func Test_Distribution(t *testing.T) {
 		stat.Update(float64(count))
 		delete(distribution, key)
 	}
-	fmt.Printf("Stddev for %d keys mapped across %d servers = %.2f\n", len(keys), serverCount, stat.PopulationStandardDeviation())
+	t.Logf("Stddev for %d keys mapped across %d servers = %.2f\n", len(keys), serverCount, stat.PopulationStandardDeviation())
 
 	c.Remove("server" + strconv.Itoa(serverCount/2))
 	stat = stats.Stats{}
@@ -74,8 +74,8 @@ func Test_Distribution(t *testing.T) {
 		stat.Update(float64(count))
 		delete(distribution, key)
 	}
-	fmt.Printf("Stddev for %d keys mapped across %d servers after one server removed = %.2f\n", len(keys), serverCount, stat.PopulationStandardDeviation())
-	fmt.Printf("Number of keys out of %d remapped after removing 1 out of %d servers = %d\n", len(keys), serverCount, len(keymapping))
+	t.Logf("Stddev for %d keys mapped across %d servers after one server removed = %.2f\n", len(keys), serverCount, stat.PopulationStandardDeviation())
+	t.Logf("Number of keys out of %d remapped after removing 1 out of %d servers = %d\n", len(keys), serverCount, len(keymapping))
 }
 
 // Benchmark_DefaultLookup tests how fast lookups are if each node has the default number of vnodes
