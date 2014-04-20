@@ -28,18 +28,18 @@ func rand_bytes(size int) []byte {
 	return bytes
 }
 
-// Test_vnodeAdd verifies that the correct number of vnodes are added after an Add() call
-func Test_vnodeAdd(t *testing.T) {
+// TestvnodeAdd verifies that the correct number of vnodes are added after an Add() call
+func TestvnodeAdd(t *testing.T) {
 	c := New()
 	c.Add("localhost")
 	assert.Equal(t, c.vnodeCount, len(c.vnodes))
 
 }
 
-// Test_Distribution tests how well keys are distributed across servers
+// TestDistribution tests how well keys are distributed across servers
 // and how many keys are remapped after a node is removed
 // This is informational, not a pass/fail test
-func Test_Distribution(t *testing.T) {
+func TestDistribution(t *testing.T) {
 	c := New()
 	serverCount := 10
 	for i := 0; i < serverCount; i++ {
@@ -120,8 +120,8 @@ func Benchmark_1000VnodeLookup(b *testing.B) {
 	}
 }
 
-// Test_insertVnode verifies that vnodes are correctly inserted in the proper order
-func Test_insertVnode(t *testing.T) {
+// TestinsertVnode verifies that vnodes are correctly inserted in the proper order
+func TestinsertVnode(t *testing.T) {
 	ch := New()
 	v1 := vnode{100, "a"}
 	v2 := vnode{50, "b"}
@@ -139,7 +139,7 @@ func Test_insertVnode(t *testing.T) {
 
 }
 
-func Test_Get2(t *testing.T) {
+func TestGet2(t *testing.T) {
 	ch := New()
 	ch.Add("server1")
 	ch.Add("server2")
@@ -148,7 +148,7 @@ func Test_Get2(t *testing.T) {
 	assert.True(t, (server1 == "server1" && server2 == "server2") || (server1 == "server2" && server2 == "server1"))
 }
 
-func Test_GetN(t *testing.T) {
+func TestGetN(t *testing.T) {
 	ch := New()
 	ch.Add("server1")
 	ch.Add("server2")
@@ -160,8 +160,8 @@ func Test_GetN(t *testing.T) {
 	assert.Equal(t, 3, len(servers))
 }
 
-// Test_removeVnode verifies that vnodes are correctly removed
-func Test_removeVnode(t *testing.T) {
+// TestremoveVnode verifies that vnodes are correctly removed
+func TestremoveVnode(t *testing.T) {
 	ch := New()
 	v1 := vnode{100, "a"}
 	v2 := vnode{50, "b"}
@@ -180,7 +180,7 @@ func Test_removeVnode(t *testing.T) {
 
 }
 
-func Example_basic() {
+func Examplebasic() {
 	// Output: key=A server=server3
 	//key=B server=server3
 	//key=C server=server1
@@ -202,7 +202,7 @@ func Example_basic() {
 	}
 }
 
-func Example_remove() {
+func Exampleremove() {
 	//Output: 3 servers
 	//key=A server=server3
 	//key=B server=server3
