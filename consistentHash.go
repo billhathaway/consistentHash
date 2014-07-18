@@ -1,4 +1,4 @@
-// consistentHash project consistentHash.go
+// Package consistentHash implements a consistent hashing algorithm
 package consistentHash
 
 import (
@@ -11,10 +11,14 @@ import (
 )
 
 var (
-	noMembersError                   = errors.New("no members added")
-	notEnoughMembersError            = errors.New("not enough members")
-	notAvailableOnceMembersAddedEror = errors.New("not available once members are added")
-	invalidVnodeCountError           = errors.New("vnodeCount must be > 0")
+	// ErrNoMembers occurs when trying to hash before any members are added
+	ErrNoMembers = errors.New("no members added")
+	// ErrNotEnoughMembers occurs when more members are asked for than are available
+	ErrNotEnoughMembers = errors.New("not enough members")
+	// ErrNotAvailableOnceMembersAdded occurs if any attempt is made to modify the vnode account once members are added
+	ErrNotAvailableOnceMembersAdded = errors.New("not available once members are added")
+	// ErrInvalidVnodeCount occurs if the vnode count is set to 0 or lower
+	ErrInvalidVnodeCount = errors.New("vnodeCount must be > 0")
 )
 
 const (
@@ -29,6 +33,7 @@ type vnode struct {
 
 type vnodes []vnode
 
+// ConsistentHash holds the internal data structures for the hashing
 type ConsistentHash struct {
 	vnodes     vnodes
 	nodes      map[string]bool
@@ -36,7 +41,7 @@ type ConsistentHash struct {
 	mutex      sync.Mutex
 }
 
-// NewConsistentHash creates a new consistentHash pointer and initializes all the necessary fields
+// New creates a new consistentHash pointer and initializes all the necessary fields
 func New() *ConsistentHash {
 	ch := new(ConsistentHash)
 	ch.nodes = make(map[string]bool)
@@ -62,10 +67,10 @@ func addressToKey(address string, increment int) []byte {
 // This must be called before any Add() calls
 func (ch *ConsistentHash) SetVnodeCount(count int) error {
 	if len(ch.nodes) > 0 {
-		return notAvailableOnceMembersAddedEror
+		return ErrNotAvailableOnceMembersAdded
 	}
 	if count < 1 {
-		return invalidVnodeCountError
+		return ErrInvalidVnodeCount
 	}
 	ch.vnodeCount = count
 	return nil
@@ -110,7 +115,7 @@ func (ch *ConsistentHash) Get(key []byte) (string, error) {
 	ch.mutex.Lock()
 	defer ch.mutex.Unlock()
 	if len(ch.vnodes) == 0 {
-		return "", noMembersError
+		return "", ErrNoMembers
 	}
 	token := murmur3.Sum64(key)
 	return ch.vnodes[ch.closest(token)].address, nil
@@ -133,7 +138,7 @@ func (ch *ConsistentHash) GetN(key []byte, count int) ([]string, error) {
 	ch.mutex.Lock()
 	defer ch.mutex.Unlock()
 	if len(ch.nodes) < count {
-		return nil, notEnoughMembersError
+		return nil, ErrNotEnoughMembers
 	}
 	token := murmur3.Sum64(key)
 	addressMap := make(map[string]bool)

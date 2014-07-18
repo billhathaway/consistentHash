@@ -17,19 +17,19 @@ var (
 func init() {
 	keys = make([][]byte, 10000)
 	for i := 0; i < len(keys); i++ {
-		keys[i] = rand_bytes(10)
+		keys[i] = randBytes(10)
 	}
 
 }
 
-func rand_bytes(size int) []byte {
+func randBytes(size int) []byte {
 	var bytes = make([]byte, size)
 	rand.Read(bytes)
 	return bytes
 }
 
-// TestvnodeAdd verifies that the correct number of vnodes are added after an Add() call
-func TestvnodeAdd(t *testing.T) {
+// TestVnodeAdd verifies that the correct number of vnodes are added after an Add() call
+func TestVnodeAdd(t *testing.T) {
 	c := New()
 	c.Add("localhost")
 	assert.Equal(t, c.vnodeCount, len(c.vnodes))
@@ -80,6 +80,7 @@ func TestDistribution(t *testing.T) {
 
 // Benchmark_DefaultLookup tests how fast lookups are if each node has the default number of vnodes
 func Benchmark_DefaultLookup(b *testing.B) {
+	defer fmt.Printf("called benchmark with %d\n", b.N)
 	c := New()
 	serverCount := 10
 	for i := 0; i < serverCount; i++ {
@@ -121,7 +122,7 @@ func Benchmark_1000VnodeLookup(b *testing.B) {
 }
 
 // TestinsertVnode verifies that vnodes are correctly inserted in the proper order
-func TestinsertVnode(t *testing.T) {
+func TestInsertVnode(t *testing.T) {
 	ch := New()
 	v1 := vnode{100, "a"}
 	v2 := vnode{50, "b"}
@@ -153,14 +154,14 @@ func TestGetN(t *testing.T) {
 	ch.Add("server1")
 	ch.Add("server2")
 	_, err := ch.GetN([]byte("testKey"), 3)
-	assert.Equal(t, err, notEnoughMembersError)
+	assert.Equal(t, err, ErrNotEnoughMembers)
 	ch.Add("server3")
 	servers, err := ch.GetN([]byte("testKey"), 3)
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(servers))
 }
 
-// TestremoveVnode verifies that vnodes are correctly removed
+// TestRemoveVnode verifies that vnodes are correctly removed
 func TestremoveVnode(t *testing.T) {
 	ch := New()
 	v1 := vnode{100, "a"}
